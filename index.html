@@ -206,8 +206,17 @@ function demoBlock(msg){
 
 /* ===== ЛИЦЕНЗ / LOGIN ===== */
 function showLogin(){
-  document.getElementById('licenseScreen').style.display='none';
-  document.getElementById('loginScreen').classList.add('show');
+  var ls=document.getElementById('licenseScreen');
+  var login=document.getElementById('loginScreen');
+  ls.style.display='none';
+  ls.style.visibility='hidden';
+  ls.style.zIndex='-1';
+  login.style.display='flex';
+  login.style.flexDirection='column';
+  login.style.alignItems='center';
+  login.style.justifyContent='center';
+  login.style.visibility='visible';
+  login.classList.add('show');
 }
 const PASS_KEY='greenautosystems_demo_auth';
 const DEMO_PASS='demo2024';
@@ -783,10 +792,4 @@ function exportICS(){
   lines.push('END:VCALENDAR');
   const blob=new Blob([lines.join('\r\n')],{type:'text/calendar'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='greenautosystems_kalendar_'+new Date().toISOString().slice(0,10)+'.ics';a.click();
-  if(!al.length)alert('Няма срокове с дата за експорт.');
-}
-
-/* ===== АРХИВ ===== */
-function exportData(){
-  const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='greenautosystems_arhiv_'+new D
+  if(!al.length)alert('Няма срокове с дата за
