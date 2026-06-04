@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GreenAutoSystems — AutoSystems-10 ДЕМО</title>
+<style>
+  :root{
+    --bg:#0f172a;--panel:#1e293b;--panel2:#273549;--line:#334155;
+    --txt:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8;--accent2:#0ea5e9;
+    --green:#22c55e;--amber:#f59e0b;--red:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:14px}
+
+  /* ===== ЛИЦЕНЗ ЕКРАН ===== */
+  #licenseScreen{position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 100%);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:0}
+  .license-box{background:rgba(30,41,59,.95);border:2px solid #0ea5e9;border-radius:20px;padding:44px 52px;width:420px;text-align:center;box-shadow:0 0 60px rgba(14,165,233,.25)}
+  .license-box .logo{font-size:52px;margin-bottom:10px}
+  .license-box .brand{font-size:30px;font-weight:800;color:#7dd3fc;margin-bottom:4px;letter-spacing:-0.5px}
+  .license-box .pkg{font-size:16px;color:#38bdf8;margin-bottom:20px;font-weight:600}
+  .license-box .demo-badge{display:inline-block;background:linear-gradient(90deg,#f59e0b,#d97706);color:#fff;font-size:13px;font-weight:800;padding:6px 20px;border-radius:30px;letter-spacing:1px;margin-bottom:22px}
+  .license-box .info-row{background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.3);border-radius:10px;padding:14px 18px;margin-bottom:18px;text-align:left}
+  .license-box .info-row .lbl{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+  .license-box .info-row .val{font-size:14px;color:#e2e8f0;font-weight:600;margin-top:2px}
+  .license-box .btn-enter{width:100%;padding:13px;background:linear-gradient(90deg,#0ea5e9,#1e3a8a);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;margin-top:6px;letter-spacing:.3px}
+  .license-box .btn-enter:hover{opacity:.9}
+  #licenseScreen .copy{color:#334155;font-size:11px;margin-top:18px}
+
+  /* ===== ДЕМО ЛЕНТА ===== */
+  .demo-bar{background:linear-gradient(90deg,#92400e,#b45309);padding:7px 20px;display:flex;align-items:center;justify-content:center;gap:16px;font-size:12px;font-weight:600;color:#fef3c7;letter-spacing:.3px}
+  .demo-bar span{background:rgba(0,0,0,.2);padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;color:#fde68a}
+
+  /* ===== LOGIN ===== */
+  #loginScreen{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:0}
+  #loginScreen.show{display:flex}
+  .login-box{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:40px 44px;width:360px;text-align:center}
+  .login-box .logo{font-size:42px;margin-bottom:6px}
+  .login-box h1{font-size:24px;font-weight:800;margin:0 0 2px;color:#7dd3fc}
+  .login-box .pkg-lbl{color:#38bdf8;font-size:13px;font-weight:600;margin-bottom:4px}
+  .login-box .tagline{color:var(--muted);font-size:12px;margin-bottom:24px}
+  .login-box label{display:block;text-align:left;font-size:12px;color:var(--muted);margin:0 0 4px}
+  .login-box input{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font-size:14px;margin-bottom:16px}
+  .login-box input:focus{outline:none;border-color:var(--accent2)}
+  .login-box .btn-login{width:100%;padding:11px;background:var(--accent2);color:#fff;border:none;border-radius:9px;font-size:15px;font-weight:600;cursor:pointer}
+  .login-box .btn-login:hover{background:var(--accent)}
+  .login-box .err{color:#fca5a5;font-size:12px;margin-bottom:10px;display:none}
+  .login-box .demo-hint{margin-top:18px;font-size:11px;color:var(--muted);background:var(--panel2);border-radius:8px;padding:10px 14px;text-align:left}
+  #loginScreen .version{color:var(--muted);font-size:11px;margin-top:16px}
+
+  /* ===== APP ===== */
+  #app{display:none}
+  header{background:linear-gradient(90deg,#0369a1,#1e3a8a);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  header .brand{display:flex;align-items:center;gap:10px}
+  header h1{font-size:16px;margin:0;font-weight:800;color:#fff}
+  header .sub{color:#bae6fd;font-size:11px;margin-top:1px}
+  header .demo-tag{background:#f59e0b;color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;letter-spacing:.5px}
+  .topbtns{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .topbtns .firm-name{color:#fff;font-size:12px;font-weight:600;background:rgba(255,255,255,.12);padding:4px 10px;border-radius:6px}
+  nav{display:flex;gap:4px;background:var(--panel);padding:8px 14px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+  nav button{background:transparent;color:var(--muted);border:none;padding:9px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500}
+  nav button:hover{background:var(--panel2);color:var(--txt)}
+  nav button.active{background:var(--accent2);color:#fff}
+  main{padding:18px 20px;max-width:1200px;margin:0 auto}
+
+  /* ===== КОМПОНЕНТИ ===== */
+  .btn{background:var(--accent2);color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500}
+  .btn:hover{background:var(--accent)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+  .btn.ghost:hover{background:var(--panel2)}
+  .btn.danger{background:var(--red)}
+  .btn.sm{padding:4px 9px;font-size:12px}
+  .btn.green-btn{background:#16a34a}
+  h2{font-size:16px;margin:0 0 14px;font-weight:600}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+  tr:hover td{background:var(--panel2)}
+  .pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+  .ok{background:rgba(34,197,94,.18);color:#86efac}
+  .warn{background:rgba(245,158,11,.18);color:#fcd34d}
+  .crit{background:rgba(239,68,68,.2);color:#fca5a5}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+  .kpi{background:var(--panel2);border-radius:10px;padding:14px}
+  .kpi .n{font-size:28px;font-weight:700}
+  .kpi .l{color:var(--muted);font-size:12px;margin-top:2px}
+  .kpi.red .n{color:#fca5a5}.kpi.amber .n{color:#fcd34d}.kpi.green .n{color:#86efac}.kpi.blue .n{color:#7dd3fc}
+  label{display:block;font-size:12px;color:var(--muted);margin:8px 0 3px}
+  input,select{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--txt);font-size:13px}
+  input:focus,select:focus{outline:none;border-color:var(--accent2)}
+  input[disabled],select[disabled],input[readonly]{opacity:.55;cursor:not-allowed}
+  .formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px 14px}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:flex-start;justify-content:center;padding:28px 14px;overflow:auto;z-index:50}
+  .modal-bg.show{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;width:100%;max-width:940px}
+  .modal h3{margin:0 0 6px;font-size:17px}
+  .modal .sec{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .modal .sec h4{margin:0 0 6px;font-size:13px;color:var(--accent);font-weight:600}
+  .row-actions{display:flex;gap:6px;justify-content:flex-end}
+  .empty{color:var(--muted);text-align:center;padding:28px}
+  .muted{color:var(--muted)}
+  .alertrow td{border-left:3px solid transparent}
+  .alertrow.crit td{border-left-color:var(--red)}
+  .alertrow.warn td{border-left-color:var(--amber)}
+  .tag{font-size:11px;color:var(--muted);background:var(--panel2);padding:2px 7px;border-radius:6px}
+  .right{margin-left:auto}
+  .flex{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;position:sticky;bottom:-20px;background:var(--panel);padding:12px 0 0;border-top:1px solid var(--line)}
+  small.hint{color:var(--muted);font-size:11px}
+  .scroll{overflow:auto}
+  .minitbl input,.minitbl select{padding:5px 6px;font-size:12px;min-width:70px}
+  .chk{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--txt)}
+  .chk input{width:auto}
+  .chkrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:4px}
+  a.lnk{color:var(--accent)}
+  .settings-section{background:var(--panel2);border-radius:10px;padding:16px;margin-bottom:14px}
+  .settings-section h3{margin:0 0 12px;font-size:14px;font-weight:600;color:var(--accent)}
+  .demo-notice{background:rgba(245,158,11,.1);border:1px solid #d97706;border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:#fde68a}
+  .demo-notice b{color:#fbbf24}
+  footer.app-footer{background:#0a0f1e;border-top:1px solid var(--line);padding:14px 20px;text-align:center;font-size:11px;color:#334155;line-height:1.7}
+  footer.app-footer a{color:#475569}
+</style>
+</head>
+<body>
+
+<!-- ===== ЛИЦЕНЗ ЕКРАН ===== -->
+<div id="licenseScreen">
+  <div class="license-box">
+    <div class="logo">🚗</div>
+    <div class="brand">GreenAutoSystems</div>
+    <div class="pkg">AutoSystems-10 · до 10 автомобила</div>
+    <div class="demo-badge">⚠ ДЕМО ВЕРСИЯ</div>
+    <div class="info-row">
+      <div class="lbl">Лицензиран за</div>
+      <div class="val">ДЕМО — данните са примерни</div>
+    </div>
+    <div class="info-row">
+      <div class="lbl">Разработено от</div>
+      <div class="val">Green Systems Net SVCC · Sofia, Bulgaria</div>
+    </div>
+    <button class="btn-enter" onclick="showLogin()">Разгледай ДЕМО →</button>
+  </div>
+  <div class="copy">GreenAutoSystems © 2026 · Green Systems Net SVCC · +359 899 696 907 · green.systems.net@gmail.com</div>
+</div>
+
+<!-- ===== LOGIN ===== -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="logo">🚗</div>
+    <h1>GreenAutoSystems</h1>
+    <div class="pkg-lbl">AutoSystems-10</div>
+    <div class="tagline">Управление на фирмени автомобили · ДЕМО версия</div>
+    <div class="err" id="loginErr">Грешна парола. Опитай отново.</div>
+    <label>Парола за достъп</label>
+    <input type="password" id="passInput" placeholder="Въведи паролата" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()">Вход →</button>
+    <div class="demo-hint">
+      📋 <b>ДЕМО версия</b> · Парола: <b>demo2024</b><br>
+      Данните са примерни. Полетата за въвеждане са заключени.
+    </div>
+  </div>
+  <div class="version">GreenAutoSystems · AutoSystems-10 · ДЕМО · Green Systems Net SVCC © 2026</div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app">
+<div class="demo-bar">
+  ⚠ ДЕМО ВЕРСИЯ — данните са примерни, полетата са заключени
+  <span>DEMO</span>
+  За вашата персонализирана версия: <b>+359 899 696 907</b> · green.systems.net@gmail.com
+</div>
+<header>
+  <div class="brand">
+    <span style="font-size:22px">🚗</span>
+    <div>
+      <h1>GreenAutoSystems <span class="demo-tag">ДЕМО</span></h1>
+      <div class="sub">AutoSystems-10 · Управление на фирмени автомобили</div>
+    </div>
+  </div>
+  <div class="topbtns">
+    <span class="firm-name" id="firmNameBadge">—</span>
+    <button class="btn ghost sm" onclick="exportICS()">📅 Календар (.ics)</button>
+    <button class="btn ghost sm" onclick="exportData()">⬇ Архив</button>
+    <button class="btn ghost sm" onclick="document.getElementById('imp').click()">⬆ Възстанови</button>
+    <input type="file" id="imp" accept="application/json" style="display:none" onchange="importData(event)">
+    <button class="btn ghost sm" onclick="doLogout()">🔒 Изход</button>
+  </div>
+</header>
+<nav id="nav"></nav>
+<main id="view"></main>
+<div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
+<footer class="app-footer">
+  <b>GreenAutoSystems · AutoSystems-10</b> · Green Systems Net SVCC © 2026 · Sofia, Bulgaria ·
+  <a href="mailto:green.systems.net@gmail.com">green.systems.net@gmail.com</a> · +359 899 696 907<br>
+  <span>Green Systems Net SVCC не носи отговорност за: грешно или непълно въведени данни; пропуснати срокове или изтекли документи; наложени глоби, санкции или административни последствия; загуба на данни; повреда на хардуер или софтуер; преки, косвени или последващи вреди от каквото и да е естество, произтичащи от използването или невъзможността за използване на програмата. Потребителят носи пълна отговорност за въведената информация и за спазването на всички законови изисквания. Препоръчваме редовно архивиране на данните.</span>
+</footer>
+</div>
+
+<script>
+/* ===== ДЕМО РЕЖИМ ===== */
+const DEMO_MODE=true;
+function demoBlock(msg){
+  alert('⚠ ДЕМО ВЕРСИЯ\n\n'+(msg||'Тази функция е недостъпна в демо версията.')+'\n\nЗа вашата персонализирана версия:\n📱 +359 899 696 907\n📧 green.systems.net@gmail.com');
+}
+
+/* ===== ЛИЦЕНЗ / LOGIN ===== */
+function showLogin(){
+  document.getElementById('licenseScreen').style.display='none';
+  document.getElementById('loginScreen').classList.add('show');
+}
+const PASS_KEY='greenautosystems_demo_auth';
+const DEMO_PASS='demo2024';
+function doLogin(){
+  const p=document.getElementById('passInput').value;
+  if(p===DEMO_PASS){
+    sessionStorage.setItem(PASS_KEY,'1');
+    document.getElementById('loginScreen').classList.remove('show');
+    document.getElementById('app').style.display='block';
+    updateFirmBadge();render();
+  } else {
+    document.getElementById('loginErr').style.display='block';
+    document.getElementById('passInput').value='';
+  }
+}
+function doLogout(){
+  sessionStorage.removeItem(PASS_KEY);
+  document.getElementById('loginScreen').classList.add('show');
+  document.getElementById('app').style.display='none';
+  document.getElementById('passInput').value='';
+  document.getElementById('loginErr').style.display='none';
+}
+function updateFirmBadge(){
+  document.getElementById('firmNameBadge').textContent='ДЕМО · '+((DB.config&&DB.config.firmName)||'Транс Логистик ЕООД');
+}
+
+/* ===== ДАННИ ===== */
+const KEY='greenautosystems_demo_v1';
+const LEAD_DAYS=7;
+let DB={config:{firmName:'Транс Логистик ЕООД',eik:'123456789',addr:'гр. София, ул. Логистична 5',password:'demo2024',warnDays:30,critDays:14,warnKm:1500,critKm:500},vehicles:[],companies:[],rims:[],tireStock:[]};
+
+function load(){
+  try{const r=localStorage.getItem(KEY);if(r)DB=JSON.parse(r);}catch(e){}
+  DB.rims=DB.rims||[];DB.tireStock=DB.tireStock||[];
+  DB.companies=DB.companies||[];DB.vehicles=DB.vehicles||[];
+  DB.config=DB.config||{firmName:'Транс Логистик ЕООД',password:'demo2024',warnDays:30,critDays:14,warnKm:1500,critKm:500};
+  if(DB.vehicles.length===0)loadDemoData();
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(DB));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+
+/* ===== ДЕМО ДАННИ ===== */
+function loadDemoData(){
+  const today=new Date();
+  const dt=(y,m,d)=>new Date(y,m-1,d).toISOString().slice(0,10);
+  const rel=(days)=>{const d=new Date(today);d.setDate(d.getDate()+days);return d.toISOString().slice(0,10);};
+
+  DB.companies=['Транс Логистик ЕООД','Строй Про ООД'];
+  DB.vehicles=[
+    {id:'demo1',brand:'Volkswagen',model:'Transporter T6',year:2019,plate:'СА 1234 АБ',vin:'WV1ZZZ7HZM123456',
+      company:'Транс Логистик ЕООД',responsible:'Иван Петров',startKm:0,currentKm:148500,
+      fuel:{benzin:false,dizel:true,gaz:false,metan:false},accounts:{fuel:'601',lub:'602'},
+      docs:{tech:rel(8),go:rel(45),vinetka:rel(180),kasko:rel(210)},fireExt:rel(60),
+      oil:{lastKm:145000,interval:10000},
+      tires:{pcd:'5x120',cb:'65.1',summer:'225/55 R17',winter:'225/55 R17',rims:'Стоманени 17"',spare:'Резервна пълна'},
+      fluids:{antifreeze:{last:dt(2024,6,1),months:24},brake:{last:dt(2024,6,1),months:24},hydraulics:{last:'',months:''},gearbox:{last:dt(2023,6,1),months:36}},
+      ac:{last:dt(2024,5,1),months:24},
+      battery:{buyDate:dt(2022,3,15),warranty:rel(-30),status:'Чака смяна',issues:'Бавно стартиране сутрин'},
+      gas:{status:'',cylinderType:'Газ',cylinderDate:'',log:[]},
+      service:[
+        {date:dt(2024,11,20),km:145000,type:'Профилактика',desc:'Смяна масло 5W30 + маслен и въздушен филтър',service:'Автосервиз Иванов',price:'320',invoice:'ФК-00421',w:{date:'',years:'',startKm:'145000',limitKm:'10000'}},
+        {date:dt(2024,6,10),km:135000,type:'Ремонт',desc:'Смяна спирачни накладки предни',service:'Автосервиз Иванов',price:'180',invoice:'ФК-00318',w:{}}
+      ],
+      repairs:[],
+      waybill:{org:'Транс Логистик',owner:'Транс Логистик ЕООД',name:'VW Transporter',eik:'123456789',req:'гр. София, ул. Логистична 5',driver:'Иван Петров',norms:'дизел: 9 л/100 км'}
+    },
+    {id:'demo2',brand:'Mercedes-Benz',model:'Sprinter 316 CDI',year:2021,plate:'СА 5678 ВГ',vin:'WDB9066351S123789',
+      company:'Транс Логистик ЕООД',responsible:'Георги Димитров',startKm:0,currentKm:95200,
+      fuel:{benzin:false,dizel:true,gaz:false,metan:false},accounts:{fuel:'601',lub:'602'},
+      docs:{tech:rel(95),go:rel(-5),vinetka:rel(210),kasko:rel(95)},fireExt:rel(120),
+      oil:{lastKm:90000,interval:15000},
+      tires:{pcd:'5x130',cb:'84.1',summer:'225/75 R16C',winter:'225/75 R16C',rims:'Стоманени 16"',spare:'Резервна пълна'},
+      fluids:{antifreeze:{last:dt(2024,1,10),months:24},brake:{last:dt(2024,1,10),months:24},hydraulics:{},gearbox:{}},
+      ac:{last:dt(2023,5,20),months:24},
+      battery:{buyDate:dt(2023,2,1),warranty:dt(2026,2,1),status:'Наред',issues:''},
+      gas:{status:'',cylinderType:'Газ',cylinderDate:'',log:[]},
+      service:[
+        {date:dt(2025,1,15),km:90000,type:'Профилактика',desc:'Масло + филтри (15 000 км)',service:'Mercedes Сервиз БГ',price:'520',invoice:'ФК-00589',w:{date:'',years:'',startKm:'90000',limitKm:'15000'}},
+        {date:dt(2024,5,10),km:75000,type:'Ремонт',desc:'Смяна задни спирачни дискове и накладки',service:'Mercedes Сервиз БГ',price:'380',invoice:'ФК-00441',w:{}}
+      ],
+      repairs:[{desc:'Проверка предно окачване — лек шум',date:rel(12),status:'Планиран'}],
+      waybill:{org:'Транс Логистик',owner:'Транс Логистик ЕООД',name:'Mercedes Sprinter',eik:'123456789',req:'гр. София, ул. Логистична 5',driver:'Георги Димитров',norms:'дизел: 11 л/100 км'}
+    },
+    {id:'demo3',brand:'Toyota',model:'Hilux 2.4 D-4D',year:2020,plate:'ПБ 8891 КМ',vin:'AHTFR22G506123456',
+      company:'Строй Про ООД',responsible:'Красимир Маринов',startKm:0,currentKm:182000,
+      fuel:{benzin:false,dizel:true,gaz:false,metan:false},accounts:{fuel:'601',lub:''},
+      docs:{tech:rel(-20),go:rel(30),vinetka:rel(-10),kasko:''},fireExt:rel(-5),
+      oil:{lastKm:177000,interval:10000},
+      tires:{pcd:'6x139.7',cb:'106.1',summer:'265/65 R17',winter:'265/65 R17',rims:'Алуминиеви 17"',spare:'Резервна пълна'},
+      fluids:{antifreeze:{last:dt(2023,4,1),months:24},brake:{last:dt(2023,4,1),months:24},hydraulics:{},gearbox:{}},
+      ac:{last:dt(2023,6,1),months:24},
+      battery:{buyDate:dt(2021,8,1),warranty:dt(2024,8,1),status:'Наред',issues:''},
+      gas:{status:'',cylinderType:'Газ',cylinderDate:'',log:[]},
+      service:[
+        {date:dt(2025,1,10),km:177000,type:'Профилактика',desc:'Масло + всички филтри',service:'Тойота Оторизиран',price:'410',invoice:'ФК-00712',w:{date:'',years:'',startKm:'177000',limitKm:'10000'}},
+        {date:dt(2024,3,5),km:162000,type:'Ремонт',desc:'Смяна ремък пистов кормилно',service:'Тойота Оторизиран',price:'290',invoice:'ФК-00520',w:{}}
+      ],
+      repairs:[{desc:'Проверка диференциал — вибрации при ускорение',date:rel(5),status:'Чакащ'}],
+      waybill:{org:'Строй Про',owner:'Строй Про ООД',name:'Toyota Hilux',eik:'987654321',req:'гр. Пловдив, ул. Строителна 3',driver:'Красимир Маринов',norms:'дизел: 10 л/100 км'}
+    },
+    {id:'demo4',brand:'Ford',model:'Transit Custom',year:2022,plate:'СА 3344 ДЕ',vin:'WF0WXXTTGWMA12345',
+      company:'Транс Логистик ЕООД',responsible:'Петър Колев',startKm:0,currentKm:61800,
+      fuel:{benzin:false,dizel:true,gaz:false,metan:false},accounts:{fuel:'601',lub:'602'},
+      docs:{tech:rel(200),go:rel(160),vinetka:rel(360),kasko:rel(160)},fireExt:rel(340),
+      oil:{lastKm:60000,interval:15000},
+      tires:{pcd:'5x160',cb:'65.1',summer:'235/65 R16C',winter:'235/65 R16C',rims:'Стоманени 16"',spare:'Резервна пълна'},
+      fluids:{antifreeze:{last:dt(2024,8,1),months:24},brake:{last:dt(2024,8,1),months:24},hydraulics:{},gearbox:{}},
+      ac:{last:dt(2024,7,1),months:24},
+      battery:{buyDate:dt(2024,5,1),warranty:dt(2027,5,1),status:'Наред',issues:''},
+      gas:{status:'',cylinderType:'Газ',cylinderDate:'',log:[]},
+      service:[
+        {date:dt(2025,2,20),km:60000,type:'Профилактика',desc:'Масло + филтри',service:'Форд Оторизиран',price:'380',invoice:'ФК-00801',w:{date:'',years:'',startKm:'60000',limitKm:'15000'}}
+      ],
+      repairs:[],
+      waybill:{org:'Транс Логистик',owner:'Транс Логистик ЕООД',name:'Ford Transit Custom',eik:'123456789',req:'гр. София, ул. Логистична 5',driver:'Петър Колев',norms:'дизел: 8.5 л/100 км'}
+    },
+    {id:'demo5',brand:'Dacia',model:'Duster 4x4 1.5 dCi',year:2018,plate:'СА 7711 ЖЗ',vin:'UU1HSDAAF12345678',
+      company:'Строй Про ООД',responsible:'Николай Стоянов',startKm:0,currentKm:143600,
+      fuel:{benzin:false,dizel:true,gaz:true,metan:false},accounts:{fuel:'601',lub:''},
+      docs:{tech:rel(22),go:rel(65),vinetka:rel(22),kasko:''},fireExt:rel(250),
+      oil:{lastKm:140000,interval:10000},
+      tires:{pcd:'5x114.3',cb:'66.1',summer:'225/65 R17',winter:'215/65 R17',rims:'Алуминиеви 17"',spare:'Резервна компактна'},
+      fluids:{antifreeze:{last:dt(2024,3,1),months:24},brake:{last:dt(2024,3,1),months:24},hydraulics:{},gearbox:{}},
+      ac:{last:dt(2023,5,15),months:24},
+      battery:{buyDate:dt(2022,10,1),warranty:dt(2025,10,1),status:'Наред',issues:''},
+      gas:{status:'Вписана',cylinderType:'Газ',cylinderDate:dt(2018,6,15),log:[
+        {date:dt(2023,5,20),km:95000,desc:'Смяна газов филтър + регулация',service:'Газ Сервиз ЕООД',price:'95',w:{date:dt(2023,5,20),years:'2',startKm:'95000',limitKm:'30000'}}
+      ]},
+      service:[
+        {date:dt(2025,1,5),km:140000,type:'Профилактика',desc:'Масло + маслен филтър',service:'Дачия Оторизиран',price:'220',invoice:'ФК-00655',w:{date:'',years:'',startKm:'140000',limitKm:'10000'}},
+        {date:dt(2023,8,14),km:112000,type:'Ремонт',desc:'Смяна задна биелета лява',service:'Дачия Оторизиран',price:'145',invoice:'ФК-00380',w:{}}
+      ],
+      repairs:[],
+      waybill:{org:'Строй Про',owner:'Строй Про ООД',name:'Dacia Duster',eik:'987654321',req:'гр. Пловдив, ул. Строителна 3',driver:'Николай Стоянов',norms:'дизел: 7 л/100 км'}
+    }
+  ];
+  DB.rims=[
+    {id:'r1',name:'Стоманени VW 17"',material:'Стомана',pcd:'5x120',cb:'65.1',dia:'17',width:'7',et:'55',qty:'4',cond:'Добро',location:'Склад A',mountedOn:''},
+    {id:'r2',name:'Алуминиеви Dacia 17"',material:'Алуминий',pcd:'5x114.3',cb:'66.1',dia:'17',width:'7',et:'43',qty:'4',cond:'Добро',location:'Склад B',mountedOn:'demo5'}
+  ];
+  DB.tireStock=[
+    {id:'t1',size:'225/55 R17',season:'Зимни',brand:'Michelin Alpin',dot:'3821',qty:'4',tread:'6.5',location:'Склад A',mountedOn:''},
+    {id:'t2',size:'225/75 R16C',season:'Зимни',brand:'Continental VanContact',dot:'4020',qty:'4',tread:'7',location:'Склад B',mountedOn:''}
+  ];
+  save();
+}
+
+load();
+
+/* ===== НАСТРОЙКИ ===== */
+function getCfg(k,def){return(DB.config&&DB.config[k]!=null)?DB.config[k]:def;}
+function DAY_WARN(){return getCfg('warnDays',30);}
+function DAY_CRIT(){return getCfg('critDays',14);}
+function KM_WARN(){return getCfg('warnKm',1500);}
+function KM_CRIT(){return getCfg('critKm',500);}
+
+/* ===== ДАТИ/КМ ===== */
+const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d;};
+function daysLeft(s){if(!s)return null;const d=new Date(s);d.setHours(0,0,0,0);return Math.round((d-today())/86400000);}
+function fmtDate(s){if(!s)return '—';const d=new Date(s);return d.toLocaleDateString('bg-BG');}
+function addMonths(s,m){if(!s||!m)return null;const d=new Date(s);d.setMonth(d.getMonth()+Number(m));return d.toISOString().slice(0,10);}
+function addYears(s,y){if(!s||!y)return null;const d=new Date(s);d.setFullYear(d.getFullYear()+Number(y));return d.toISOString().slice(0,10);}
+function num(x){return(x==null||x==='')?null:Number(x);}
+
+function dayStatus(dl){if(dl==null)return null;if(dl<0)return 'crit-over';if(dl<=DAY_CRIT())return 'crit';if(dl<=DAY_WARN())return 'warn';return 'ok';}
+function kmStatus(kl){if(kl==null)return null;if(kl<0)return 'crit-over';if(kl<=KM_CRIT())return 'crit';if(kl<=KM_WARN())return 'warn';return 'ok';}
+const RANK={'crit-over':0,'crit':1,'warn':2,'ok':3};
+function worse(a,b){if(a==null)return b;if(b==null)return a;return RANK[a]<=RANK[b]?a:b;}
+function pill(st,txt){const m={'ok':['ok','ОК'],'warn':['warn','Наближава'],'crit':['crit','Спешно'],'crit-over':['crit','ПРОСРОЧЕН']}[st]||['',''];return`<span class="pill ${m[0]}">${txt||m[1]}</span>`;}
+function vlabel(v){return`${v.brand||''} ${v.model||''}`.trim()||'(без име)';}
+
+function warranty(w,curKm){
+  if(!w)return null;
+  let dl=null,kl=null,endDate=null,endKm=null;
+  if(w.date&&(num(w.years)||num(w.months))){endDate=num(w.years)?addYears(w.date,w.years):addMonths(w.date,w.months);dl=daysLeft(endDate);}
+  if(num(w.startKm)!=null&&num(w.limitKm)){endKm=num(w.startKm)+num(w.limitKm);if(num(curKm)!=null)kl=endKm-num(curKm);}
+  if(dl==null&&kl==null)return null;
+  const st=worse(dayStatus(dl),kmStatus(kl));
+  let parts=[];
+  if(dl!=null)parts.push(dl<0?`просрочена с ${-dl} дни`:`${dl} дни`);
+  if(kl!=null)parts.push(kl<0?`надхвърлена с ${-kl} км`:`${kl} км`);
+  return{status:st,dl,kl,endDate,endKm,text:'остават '+parts.join(' / ')};
+}
+
+/* ===== ИЗВЕСТИЯ ===== */
+const DOC_DEFS=[{k:'tech',label:'Технически преглед'},{k:'go',label:'Гражданска отговорност'},{k:'vinetka',label:'Винетка'},{k:'kasko',label:'Каско'}];
+const FLUID_DEFS=[{k:'antifreeze',label:'Антифриз'},{k:'brake',label:'Спирачна течност'},{k:'hydraulics',label:'Хидравлика'},{k:'gearbox',label:'Масло скоростна кутия'}];
+function gasLegal(v){return v.gas&&(v.gas.status==='Фабрична'||v.gas.status==='Вписана');}
+function collectAlerts(){
+  const out=[];
+  DB.vehicles.forEach(v=>{
+    const name=vlabel(v),reg=v.plate||'',cur=v.currentKm;
+    const add=(cat,st,info,date)=>out.push({veh:v.id,name,reg,cat,status:st,info,date});
+    DOC_DEFS.forEach(d=>{const dl=daysLeft(v.docs?.[d.k]);if(dl!=null)add(d.label,dayStatus(dl),infoDate(v.docs[d.k],dl),v.docs[d.k]);});
+    {const dl=daysLeft(v.fireExt);if(dl!=null)add('Пожарогасител',dayStatus(dl),infoDate(v.fireExt,dl),v.fireExt);}
+    {const lk=num(v.oil?.lastKm),it=num(v.oil?.interval),ck=num(cur);if(lk!=null&&it&&ck!=null){const kl=lk+it-ck;add('Смяна масло/филтри',kmStatus(kl),kl+' км',null);}}
+    FLUID_DEFS.forEach(f=>{const fl=v.fluids?.[f.k];if(fl&&fl.last&&fl.months){const nx=addMonths(fl.last,fl.months);const dl=daysLeft(nx);if(dl!=null)add('Проверка: '+f.label,dayStatus(dl),infoDate(nx,dl),nx);}});
+    if(v.ac&&v.ac.last&&v.ac.months){const nx=addMonths(v.ac.last,v.ac.months);const dl=daysLeft(nx);if(dl!=null)add('Фреон климатик',dayStatus(dl),infoDate(nx,dl),nx);}
+    if(v.battery&&v.battery.warranty){const dl=daysLeft(v.battery.warranty);if(dl!=null)add('Гаранция акумулатор',dayStatus(dl),infoDate(v.battery.warranty,dl),v.battery.warranty);}
+    if(v.battery&&v.battery.status==='Чака смяна')add('Акумулатор — чака смяна','warn','маркиран за смяна',null);
+    if(gasLegal(v)&&v.gas.cylinderDate){const yrs=v.gas.cylinderType==='Метан'?20:10;const end=addYears(v.gas.cylinderDate,yrs);const dl=daysLeft(end);if(dl!=null)add(`Срок на бутилка (${v.gas.cylinderType||'газ'})`,dayStatus(dl),infoDate(end,dl),end);}
+    (v.gas?.log||[]).forEach(e=>{const w=warranty(e.w,cur);if(w&&w.status)add('Гаранция газ: '+(e.desc||''),w.status,w.text,w.endDate);});
+    (v.service||[]).forEach(e=>{const w=warranty(e.w,cur);if(w&&w.status)add('Гаранция: '+(e.desc||''),w.status,w.text,w.endDate);});
+    (v.repairs||[]).filter(r=>r.status!=='Завършен').forEach(r=>{const dl=daysLeft(r.date);add('Ремонт: '+(r.desc||''),dl==null?'warn':dayStatus(dl),r.date?infoDate(r.date,dl):'планиран',r.date);});
+  });
+  out.sort((a,b)=>((RANK[a.status]??4)-(RANK[b.status]??4)));
+  return out;
+}
+function infoDate(d,dl){if(dl==null)return fmtDate(d);return`${fmtDate(d)} (${dl<0?'преди '+(-dl):'след '+dl} дни)`;}
+
+/* ===== НАВИГАЦИЯ ===== */
+const TABS=[['dash','📊 Табло'],['vehicles','🚗 Автомобили'],['companies','🏢 Фирми'],['tires','🛞 Гуми/Джанти'],['settings','⚙ Настройки'],['help','❓ Помощ']];
+let current='dash';
+function renderNav(){document.getElementById('nav').innerHTML=TABS.map(t=>`<button class="${current===t[0]?'active':''}" onclick="go('${t[0]}')">${t[1]}</button>`).join('');}
+function go(t){current=t;renderNav();render();}
+function render(){const el=document.getElementById('view');el.innerHTML=current==='dash'?viewDash():current==='vehicles'?viewVehicles():current==='companies'?viewCompanies():current==='tires'?viewTires():current==='settings'?viewSettings():viewHelp();}
+
+/* ===== ТАБЛО ===== */
+function viewDash(){
+  const a=collectAlerts();
+  const over=a.filter(x=>x.status==='crit-over').length;
+  const crit=a.filter(x=>x.status==='crit').length;
+  const warn=a.filter(x=>x.status==='warn').length;
+  const act=a.filter(x=>x.status!=='ok');
+  let rows=act.length?act.map(x=>{const cls=(x.status==='crit-over'||x.status==='crit')?'crit':(x.status==='warn'?'warn':'');return`<tr class="alertrow ${cls}"><td><b>${x.name}</b><div class="tag">${x.reg||'—'}</div></td><td>${x.cat}</td><td>${x.info||''}</td><td>${pill(x.status)}</td></tr>`;}).join(''):`<tr><td colspan="4" class="empty">Няма наближаващи срокове 🎉</td></tr>`;
+  return`<div class="demo-notice">⚠ <b>ДЕМО версия</b> — данните са примерни и илюстративни. В платената версия въвеждате данните на вашите реални автомобили. <b>+359 899 696 907</b></div>
+  <div class="grid" style="margin-bottom:16px">
+    <div class="kpi red"><div class="n">${over}</div><div class="l">Просрочени</div></div>
+    <div class="kpi red"><div class="n">${crit}</div><div class="l">Спешни (≤${DAY_CRIT()} дни)</div></div>
+    <div class="kpi amber"><div class="n">${warn}</div><div class="l">Наближаващи (≤${DAY_WARN()} дни)</div></div>
+    <div class="kpi blue"><div class="n">${DB.vehicles.length}</div><div class="l">Автомобила в парка</div></div>
+  </div>
+  <div class="card">
+    <div class="flex"><h2 style="margin:0">🔔 Известия за срокове</h2><span class="right muted" style="font-size:12px">Подредени по спешност</span></div>
+    <table style="margin-top:12px"><thead><tr><th>Автомобил</th><th>Какво</th><th>Срок / остатък</th><th>Статус</th></tr></thead><tbody>${rows}</tbody></table>
+  </div>`;
+}
+
+/* ===== АВТОМОБИЛИ ===== */
+function viewVehicles(){
+  const al=collectAlerts();
+  let rows=DB.vehicles.length?DB.vehicles.map(v=>{
+    const a=al.filter(x=>x.veh===v.id&&x.status!=='ok');
+    const worst=a.some(x=>x.status==='crit-over'||x.status==='crit')?'crit':(a.length?'warn':'ok');
+    const fuel=fuelLabel(v);
+    return`<tr>
+      <td><b>${vlabel(v)}</b><div class="tag">${v.year||''}${fuel?' · '+fuel:''}</div></td>
+      <td>${v.plate||'—'}</td><td>${v.company||'—'}</td>
+      <td>${num(v.currentKm)!=null?Number(v.currentKm).toLocaleString('bg-BG')+' км':'—'}</td>
+      <td>${a.length?pill(worst==='crit'?'crit':'warn',a.length+' известия'):pill('ok','наред')}</td>
+      <td class="row-actions">
+        <button class="btn sm" onclick="printWaybill('${v.id}')" title="Пътен лист">🧾</button>
+        <button class="btn sm green-btn" onclick="printServiceBook('${v.id}')" title="Сервизна книжка">📋</button>
+        <button class="btn sm" onclick="openVehicle('${v.id}')">Отвори</button>
+      </td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="6" class="empty">Няма въведени автомобили.</td></tr>`;
+  return`<div class="card">
+    <div class="flex">
+      <h2 style="margin:0">🚗 Автомобили</h2>
+      <button class="btn right" onclick="demoBlock('Добавянето на нови автомобили е налично само в платената версия.')">+ Добави автомобил</button>
+    </div>
+    <table style="margin-top:12px"><thead><tr><th>Марка/Модел</th><th>Рег. №</th><th>Фирма</th><th>Пробег</th><th>Срокове</th><th>🧾 📋</th></tr></thead><tbody>${rows}</tbody></table>
+    <small class="hint" style="margin-top:8px;display:block">🧾 Пътен лист · 📋 Сервизна книжка (печат)</small>
+  </div>`;
+}
+function fuelLabel(v){const f=v.fuel||{};return[f.benzin&&'бензин',f.dizel&&'дизел',f.gaz&&'газ',f.metan&&'метан'].filter(Boolean).join('/');}
+
+/* ===== ФИРМИ ===== */
+function viewCompanies(){
+  const counts={};DB.vehicles.forEach(v=>{const c=v.company||'(неразпределени)';counts[c]=(counts[c]||0)+1;});
+  let rows=DB.companies.map(c=>`<tr><td><b>${c}</b></td><td>${counts[c]||0}</td><td></td></tr>`).join('');
+  return`<div class="card">
+    <div class="flex"><h2 style="margin:0">🏢 Фирми в холдинга</h2>
+    <button class="btn right" onclick="demoBlock('Управлението на фирми е налично в платената версия.')">+ Добави фирма</button></div>
+    <table style="margin-top:12px"><thead><tr><th>Фирма</th><th>Брой автомобили</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan=3 class=empty>Няма фирми</td></tr>'}</tbody></table>
+  </div>`;
+}
+
+/* ===== ГУМИ/ДЖАНТИ ===== */
+let tiresSub='compat';
+function norm(s){return(s||'').toString().trim().toUpperCase().replace(/\s+/g,'');}
+function groupBy(items,kf){const m={};items.forEach(it=>{const k=kf(it);if(!k)return;(m[k]=m[k]||[]).push(it);});return m;}
+function vehName(id){const v=DB.vehicles.find(x=>x.id===id);return v?vlabel(v)+(v.plate?' ('+v.plate+')':''):'—';}
+function vehOptions(sel){return'<option value="">— склад (свободно) —</option>'+DB.vehicles.map(v=>`<option value="${v.id}" ${sel===v.id?'selected':''}>${vlabel(v)} ${v.plate||''}</option>`).join('');}
+function viewTires(){
+  const subs=[['compat','🔁 Съвместимост'],['rims','⚙ Склад джанти'],['stock','🛞 Склад гуми'],['card','📋 По автомобил']];
+  const tabs=subs.map(s=>`<button class="btn ${tiresSub===s[0]?'':'ghost'} sm" onclick="tiresSub='${s[0]}';render()">${s[1]}</button>`).join(' ');
+  let body=tiresSub==='compat'?tiresCompat():tiresSub==='rims'?rimsStock():tiresSub==='stock'?tireStockView():tiresByCar();
+  return`<div class="card"><div class="flex"><h2 style="margin:0">🛞 Гуми и джанти</h2><span class="right">${tabs}</span></div></div>${body}`;
+}
+function tiresCompat(){
+  const vs=DB.vehicles;
+  const sg=groupBy(vs,v=>norm(v.tires?.summer)),wg=groupBy(vs,v=>norm(v.tires?.winter));
+  const pg=groupBy(vs,v=>{const t=v.tires||{};return(t.pcd&&t.cb)?norm(t.pcd)+'|ЦО'+norm(t.cb):'';});
+  function block(g,disp){const keys=Object.keys(g).sort((a,b)=>g[b].length-g[a].length);if(!keys.length)return`<p class="muted">Няма въведени данни.</p>`;return`<table><thead><tr><th>${disp}</th><th>Бр.</th><th>Автомобили</th><th>Извод</th></tr></thead><tbody>`+keys.map(k=>{const a=g[k];return`<tr><td><b>${k}</b></td><td>${a.length}</td><td>${a.map(v=>`${vlabel(v)} <span class="tag">${v.plate||'—'}</span>`).join(' · ')}</td><td>${a.length>1?pill('ok','взаимозаменяеми'):'<span class="muted">единствена</span>'}</td></tr>`;}).join('')+`</tbody></table>`;}
+  return`<div class="card"><h2>☀ Летни гуми — по размер</h2>${block(sg,'Размер (летни)')}</div><div class="card"><h2>❄ Зимни гуми — по размер</h2>${block(wg,'Размер (зимни)')}</div><div class="card"><h2>⚙ Джанти — по PCD + централен отвор</h2><small class="hint">Еднакъв болтови чертеж + ЦО → джантите са взаимозаменяеми.</small><div style="margin-top:10px">${block(pg,'PCD | ЦО')}</div></div>`;
+}
+function tiresByCar(){
+  let rows=DB.vehicles.length?DB.vehicles.map(v=>{const t=v.tires||{};return`<tr><td><b>${vlabel(v)}</b><div class="tag">${v.plate||''}</div></td><td>${t.pcd||'—'}</td><td>${t.cb||'—'}</td><td>${t.summer||'—'}</td><td>${t.winter||'—'}</td><td>${t.rims||'—'}</td><td>${t.spare||'—'}</td></tr>`;}).join(''):`<tr><td colspan="7" class="empty">Няма данни.</td></tr>`;
+  return`<div class="card"><table style="margin-top:12px"><thead><tr><th>Автомобил</th><th>PCD</th><th>ЦО</th><th>Летни</th><th>Зимни</th><th>Джанти</th><th>Резервна</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function fitCars(r){return DB.vehicles.filter(v=>v.tires&&norm(r.pcd)&&norm(v.tires.pcd)===norm(r.pcd)&&norm(v.tires.cb)===norm(r.cb));}
+function mountBadge(id){return id?`<span class="pill warn">монтиран: ${vehName(id)}</span>`:`<span class="pill ok">свободен</span>`;}
+function rimsStock(){
+  let rows=DB.rims.length?DB.rims.map(r=>{const fits=fitCars(r);return`<tr><td><b>${r.name||'—'}</b><div class="tag">${r.material||''}</div></td><td>${r.pcd||'—'}</td><td>${r.cb||'—'}</td><td>${r.dia?r.dia+'"':'—'}</td><td>${r.width?r.width+'J':'—'}</td><td>${r.et?'ET'+r.et:'—'}</td><td>${r.qty||0}</td><td>${mountBadge(r.mountedOn)}</td><td>${r.location||'—'}</td><td>${fits.length?fits.map(v=>`${vlabel(v)} <span class="tag">${v.plate||''}</span>`).join('<br>'):'<span class="muted">няма</span>'}</td><td class="row-actions"><button class="btn sm" onclick="demoBlock()">✎</button></td></tr>`;}).join(''):`<tr><td colspan="10" class="empty">Няма въведени джанти.</td></tr>`;
+  return`<div class="card"><div class="flex"><h2 style="margin:0">⚙ Склад джанти</h2><button class="btn right" onclick="demoBlock()">+ Добави</button></div><div class="scroll"><table style="margin-top:12px"><thead><tr><th>Наименование</th><th>PCD</th><th>ЦО</th><th>Ø</th><th>Шир.</th><th>ET</th><th>Бр.</th><th>Статус</th><th>Локация</th><th>Пасва на</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+function tireStockView(){
+  let rows=DB.tireStock.length?DB.tireStock.map(t=>{const fits=fitCarsTire(t);return`<tr><td><b>${t.size||'—'}</b></td><td>${t.season||'—'}</td><td>${t.brand||'—'}</td><td>${t.dot||'—'}</td><td>${t.qty||0}</td><td>${t.tread?t.tread+' mm':'—'}</td><td>${mountBadge(t.mountedOn)}</td><td>${t.location||'—'}</td><td>${fits.length?fits.map(v=>`${vlabel(v)} <span class="tag">${v.plate||''}</span>`).join('<br>'):'<span class="muted">няма</span>'}</td><td class="row-actions"><button class="btn sm" onclick="demoBlock()">✎</button></td></tr>`;}).join(''):`<tr><td colspan="10" class="empty">Няма складирани гуми.</td></tr>`;
+  return`<div class="card"><div class="flex"><h2 style="margin:0">🛞 Склад гуми</h2><button class="btn right" onclick="demoBlock()">+ Добави</button></div><div class="scroll"><table style="margin-top:12px"><thead><tr><th>Размер</th><th>Сезон</th><th>Марка</th><th>DOT</th><th>Бр.</th><th>Грайфер</th><th>Статус</th><th>Локация</th><th>Пасва на</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+function fitCarsTire(t){const n=norm(t.size);return DB.vehicles.filter(v=>v.tires&&n&&(norm(v.tires.summer)===n||norm(v.tires.winter)===n));}
+
+/* ===== НАСТРОЙКИ (само четене в ДЕМО) ===== */
+function viewSettings(){
+  const c=DB.config||{};
+  return`<div class="demo-notice">⚠ <b>В платената версия</b> тук са вградени данните на вашата фирма (само за четене): наименование, ЕИК, адрес. Паролата е персонализирана само за вас.</div>
+  <div class="settings-section">
+    <h3>🏢 Данни за фирмата <span style="color:#d97706;font-size:11px">(само за четене в ДЕМО)</span></h3>
+    <div class="formgrid">
+      <div><label>Наименование на фирмата</label><input readonly value="${c.firmName||''}"></div>
+      <div><label>ЕИК / БУЛСТАТ</label><input readonly value="${c.eik||'123456789'}"></div>
+      <div><label>Адрес</label><input readonly value="${c.addr||'гр. София, ул. Логистична 5'}"></div>
+      <div><label>Пакет</label><input readonly value="AutoSystems-10 · ДЕМО версия"></div>
+    </div>
+  </div>
+  <div class="settings-section">
+    <h3>⚡ Прагове за известия <span style="color:#d97706;font-size:11px">(само за четене в ДЕМО)</span></h3>
+    <div class="formgrid">
+      <div><label>Предупреждение — дни преди срок</label><input readonly value="${c.warnDays||30}"></div>
+      <div><label>Спешно — дни преди срок</label><input readonly value="${c.critDays||14}"></div>
+      <div><label>Предупреждение — км до смяна масло</label><input readonly value="${c.warnKm||1500}"></div>
+      <div><label>Спешно — км до смяна масло</label><input readonly value="${c.critKm||500}"></div>
+    </div>
+  </div>
+  <div class="settings-section">
+    <h3>🗄 Архив и възстановяване</h3>
+    <div class="flex" style="gap:10px;flex-wrap:wrap">
+      <button class="btn ghost" onclick="exportData()">⬇ Изтегли архив (JSON)</button>
+      <button class="btn ghost" onclick="document.getElementById('imp').click()">⬆ Възстанови от архив</button>
+      <button class="btn ghost sm" onclick="resetDemo()">🔄 Нулирай до демо данни</button>
+    </div>
+    <small class="hint" style="display:block;margin-top:8px">Архивирай редовно — в платената версия данните са само на твоя компютър.</small>
+  </div>
+  <div class="settings-section" style="border:1px solid #0ea5e9">
+    <h3 style="color:#7dd3fc">💡 Искате вашата персонализирана версия?</h3>
+    <p style="color:#94a3b8;font-size:13px;margin:0 0 10px">AutoSystems-10 · до 10 автомобила · 99 € без ДДС · еднократно · офлайн</p>
+    <div style="font-size:13px;color:#e2e8f0">📱 <b>+359 899 696 907</b> &nbsp;·&nbsp; 📧 <b>green.systems.net@gmail.com</b><br>
+    <span style="color:#64748b;font-size:12px">Green Systems Net SVCC · Sofia, Bulgaria · Издаваме данъчна фактура с ДДС</span></div>
+  </div>`;
+}
+
+/* ===== ПОМОЩ ===== */
+function viewHelp(){
+  return`<div class="card">
+    <h2>📖 Как работи GreenAutoSystems</h2>
+    <p>Самостоятелна програма (един HTML файл) — данните се пазят <b>локално в браузъра</b>. Не е нужен интернет за ежедневна работа. Вашите данни остават само на вашия компютър.</p>
+    <div class="grid" style="margin:16px 0">
+      <div class="kpi" style="background:var(--panel)"><div style="font-size:20px">📊</div><div style="font-weight:600;margin:4px 0">Табло</div><div class="l">Всички наближаващи и просрочени срокове, подредени по спешност с 🔴🟡🟢.</div></div>
+      <div class="kpi" style="background:var(--panel)"><div style="font-size:20px">🚗</div><div style="font-weight:600;margin:4px 0">Карта на автомобила</div><div class="l">Документи, масло, гуми, течности, климатик, акумулатор, газ, сервизна книжка, ремонти, пътен лист.</div></div>
+      <div class="kpi" style="background:var(--panel)"><div style="font-size:20px">🛞</div><div style="font-weight:600;margin:4px 0">Гуми и джанти</div><div class="l">Склад, съвместимост по PCD/ЦО, взаимозаменяемост между автомобилите.</div></div>
+      <div class="kpi" style="background:var(--panel)"><div style="font-size:20px">📋</div><div style="font-weight:600;margin:4px 0">Сервизна книжка</div><div class="l">Печатаема A4 — пълна история на обслужване. Предава се при продажба на автомобила.</div></div>
+    </div>
+    <h3 style="font-size:14px;color:var(--accent)">🔔 Цветови известия</h3>
+    <p>🔴 <b>Просрочен</b> · 🔴 <b>Спешно</b> (≤${DAY_CRIT()} дни / ≤${KM_CRIT()} км) · 🟡 <b>Наближава</b> (≤${DAY_WARN()} дни / ≤${KM_WARN()} км) · 🟢 <b>Наред</b></p>
+    <h3 style="font-size:14px;color:var(--accent)">💾 Архивиране</h3>
+    <p>„⬇ Архив" (горе вдясно) → сваля JSON файл. „⬆ Възстанови" → зарежда обратно. В платената версия — автоматично при изход.</p>
+    <h3 style="font-size:14px;color:#16a34a">🔒 Защита на данните</h3>
+    <p>Данните са само на вашия компютър — никой друг няма достъп. Без облак, без абонамент, без интернет зависимост.</p>
+    <hr style="border-color:var(--line);margin:16px 0">
+    <div style="background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.3);border-radius:10px;padding:14px">
+      <b style="color:#7dd3fc">Искате вашата версия?</b><br>
+      <span style="font-size:13px;color:#94a3b8">AutoSystems-10 · 99 € без ДДС · до 10 коли · персонализирана с вашата фирма</span><br>
+      <span style="font-size:14px;color:#e2e8f0">📱 <b>+359 899 696 907</b> · 📧 <b>green.systems.net@gmail.com</b></span>
+    </div>
+    <p style="color:var(--muted);font-size:11px;margin-top:14px">GreenAutoSystems · AutoSystems-10 · ДЕМО v1.1 · Green Systems Net SVCC © 2026</p>
+  </div>`;
+}
+
+/* ===== МОДАЛ АВТОМОБИЛ (само четене в ДЕМО) ===== */
+let DRAFT=null;
+function openVehicle(id){
+  if(!id){demoBlock('Добавянето на нови автомобили е налично само в платената версия.');return;}
+  const v=id?JSON.parse(JSON.stringify(DB.vehicles.find(x=>x.id===id))):{id:uid()};
+  v.docs=v.docs||{};v.oil=v.oil||{};v.tires=v.tires||{};v.fluids=v.fluids||{};v.ac=v.ac||{};v.repairs=v.repairs||[];
+  v.fuel=v.fuel||{};v.battery=v.battery||{};v.gas=v.gas||{};v.gas.log=v.gas.log||[];v.service=v.service||[];v.accounts=v.accounts||{};v.waybill=v.waybill||{};
+  DRAFT=v;renderVehicleModal();document.getElementById('modalBg').classList.add('show');
+}
+function wInputs(pfx,w){w=w||{};return`<input disabled data-${pfx}="date" type="date" value="${w.date||''}"><input disabled data-${pfx}="years" type="number" placeholder="год" value="${w.years||''}" style="max-width:60px"><input disabled data-${pfx}="startKm" type="number" placeholder="показ.км" value="${w.startKm||''}" style="max-width:80px"><input disabled data-${pfx}="limitKm" type="number" placeholder="лимит км" value="${w.limitKm||''}" style="max-width:80px">`;}
+function renderVehicleModal(){
+  const v=DRAFT;
+  const f=(k,d)=>`value="${(d&&d[k]!=null?d[k]:'')||''}"`;
+  const fuel=v.fuel;
+  const fluidRows=FLUID_DEFS.map(fd=>{const fl=v.fluids[fd.k]||{};return`<div><label>${fd.label} — посл. проверка</label><input disabled type="date" value="${fl.last||''}"></div><div><label>интервал (месеци)</label><input disabled type="number" value="${fl.months||''}"></div>`;}).join('');
+  const repairRows=(v.repairs||[]).map((r,i)=>`<tr><td>${r.desc||'—'}</td><td>${fmtDate(r.date)}</td><td><span class="pill ${r.status==='Завършен'?'ok':r.status==='Чакащ'?'warn':'crit'}">${r.status||''}</span></td></tr>`).join('');
+  const svcRows=(v.service||[]).map((s,i)=>`<tr><td>${fmtDate(s.date)}</td><td>${s.km?Number(s.km).toLocaleString('bg-BG')+' км':'—'}</td><td><span class="tag">${s.type||''}</span></td><td>${s.desc||'—'}</td><td>${s.service||'—'}</td><td>${s.price?s.price+' лв':'—'}</td><td>${s.invoice||'—'}</td></tr>`).join('');
+  const gasRows=(v.gas.log||[]).map((s,i)=>`<tr><td>${fmtDate(s.date)}</td><td>${s.km?Number(s.km).toLocaleString('bg-BG'):'-'}</td><td>${s.desc||'—'}</td><td>${s.service||'—'}</td><td>${s.price?s.price+' лв':'—'}</td></tr>`).join('');
+  const hasGas=fuel.gaz||fuel.metan;
+  const al=collectAlerts().filter(x=>x.veh===v.id&&x.status!=='ok');
+
+  document.getElementById('modalBox').innerHTML=`
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+    <h3 style="margin:0">🚗 ${vlabel(v)}</h3>
+    <span class="tag">${v.plate||'—'}</span>
+    ${al.length?`<span class="pill ${al.some(x=>x.status==='crit-over'||x.status==='crit')?'crit':'warn'}">${al.length} известия</span>`:''}
+    <span style="margin-left:auto;font-size:11px;color:#d97706">⚠ Само за преглед · ДЕМО</span>
+  </div>
+
+  <div class="sec"><h4>Основни данни</h4><div class="formgrid">
+    <div><label>Марка</label><input disabled ${f('brand',v)}></div>
+    <div><label>Модел</label><input disabled ${f('model',v)}></div>
+    <div><label>Година</label><input disabled type="number" ${f('year',v)}></div>
+    <div><label>Рег. номер</label><input disabled ${f('plate',v)}></div>
+    <div><label>VIN</label><input disabled ${f('vin',v)}></div>
+    <div><label>Фирма</label><input disabled value="${v.company||'—'}"></div>
+    <div><label>Отговорник</label><input disabled ${f('responsible',v)}></div>
+    <div><label>Текущ пробег (км)</label><input disabled type="number" ${f('currentKm',v)}></div>
+  </div></div>
+
+  <div class="sec"><h4>Документи (валидни до)</h4><div class="formgrid">
+    <div><label>Технически преглед</label><input disabled type="date" value="${v.docs.tech||''}"></div>
+    <div><label>Гражданска отговорност</label><input disabled type="date" value="${v.docs.go||''}"></div>
+    <div><label>Винетка</label><input disabled type="date" value="${v.docs.vinetka||''}"></div>
+    <div><label>Каско</label><input disabled type="date" value="${v.docs.kasko||''}"></div>
+    <div><label>Пожарогасител (срок до)</label><input disabled type="date" value="${v.fireExt||''}"></div>
+  </div></div>
+
+  <div class="sec"><h4>Масло и филтри</h4><div class="formgrid">
+    <div><label>Пробег при посл. смяна (км)</label><input disabled type="number" ${f('lastKm',v.oil)}></div>
+    <div><label>Интервал (км)</label><input disabled type="number" ${f('interval',v.oil)}></div>
+    <div><label>Предстои при (км)</label><input disabled value="${(num(v.oil?.lastKm)&&num(v.oil?.interval))?(num(v.oil.lastKm)+num(v.oil.interval)).toLocaleString('bg-BG')+' км':'—'}"></div>
+    <div><label>Остатък</label><input disabled value="${(num(v.oil?.lastKm)&&num(v.oil?.interval)&&num(v.currentKm))?(num(v.oil.lastKm)+num(v.oil.interval)-num(v.currentKm)).toLocaleString('bg-BG')+' км':'—'}"></div>
+  </div></div>
+
+  <div class="sec"><h4>🔋 Акумулатор</h4><div class="formgrid">
+    <div><label>Дата на покупка</label><input disabled type="date" value="${v.battery.buyDate||''}"></div>
+    <div><label>Гаранция до</label><input disabled type="date" value="${v.battery.warranty||''}"></div>
+    <div><label>Статус</label><input disabled value="${v.battery.status||'—'}"></div>
+    <div><label>Забелязани проблеми</label><input disabled value="${v.battery.issues||'—'}"></div>
+  </div></div>
+
+  ${hasGas?`<div class="sec"><h4>⛽ Газова уредба</h4><div class="formgrid">
+    <div><label>Статус</label><input disabled value="${v.gas.status||'—'}"></div>
+    <div><label>Тип бутилка</label><input disabled value="${v.gas.cylinderType||'—'}"></div>
+    <div><label>Дата монтаж бутилка</label><input disabled type="date" value="${v.gas.cylinderDate||''}"></div>
+  </div>
+  ${gasRows?`<div style="margin-top:10px"><b style="font-size:13px">Дневник</b><table class="minitbl"><thead><tr><th>Дата</th><th>Км</th><th>Дейност</th><th>Сервиз</th><th>Цена</th></tr></thead><tbody>${gasRows}</tbody></table></div>`:''}
+  </div>`:''}
+
+  <div class="sec"><h4>🔧 Сервизна книжка</h4>
+  <div style="margin-bottom:10px"><button class="btn green-btn sm" onclick="printServiceBook('${v.id}');closeModal()">📋 Печат на сервизна книжка (A4)</button></div>
+  <div class="scroll"><table><thead><tr><th>Дата</th><th>Км</th><th>Тип</th><th>Дейност</th><th>Сервиз</th><th>Цена</th><th>№ Фактура</th></tr></thead><tbody>${svcRows||'<tr><td colspan=7 class=muted>Няма записи</td></tr>'}</tbody></table></div></div>
+
+  <div class="sec"><h4>Гуми и джанти</h4><div class="formgrid">
+    <div><label>PCD</label><input disabled ${f('pcd',v.tires)}></div>
+    <div><label>ЦО (mm)</label><input disabled ${f('cb',v.tires)}></div>
+    <div><label>Летни гуми</label><input disabled ${f('summer',v.tires)}></div>
+    <div><label>Зимни гуми</label><input disabled ${f('winter',v.tires)}></div>
+    <div><label>Джанти (монтирани)</label><input disabled ${f('rims',v.tires)}></div>
+    <div><label>Резервна гума</label><input disabled ${f('spare',v.tires)}></div>
+  </div></div>
+
+  <div class="sec"><h4>Периодични проверки на течности</h4><div class="formgrid">${fluidRows}</div></div>
+
+  ${repairRows?`<div class="sec"><h4>🔨 Ремонти</h4><table><thead><tr><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead><tbody>${repairRows}</tbody></table></div>`:''}
+
+  <div class="modal-actions">
+    <button class="btn ghost" onclick="closeModal()">Затвори</button>
+    <button class="btn" onclick="printWaybill('${v.id}')">🧾 Пътен лист</button>
+    <button class="btn green-btn" onclick="printServiceBook('${v.id}')">📋 Сервизна книжка</button>
+  </div>`;
+}
+
+function saveVehicle(){demoBlock('Запазването на промени е налично само в платената версия.');}
+function delVehicle(){demoBlock();}
+function closeModal(){document.getElementById('modalBg').classList.remove('show');DRAFT=null;}
+
+/* ===== СЕРВИЗНА КНИЖКА — ПЕЧАТ ===== */
+function printServiceBook(id){
+  const v=DB.vehicles.find(x=>x.id===id);if(!v)return;
+  const svc=v.service||[];
+  const rows=svc.map((s,i)=>`<tr>
+    <td>${fmtDate(s.date)}</td>
+    <td>${s.km?Number(s.km).toLocaleString('bg-BG'):''}</td>
+    <td>${s.type||''}</td>
+    <td>${s.desc||''}</td>
+    <td>${s.service||''}</td>
+    <td>${s.price?s.price+' лв':''}</td>
+    <td>${s.invoice||''}</td>
+    <td>${s.w&&s.w.date?fmtDate(s.w.date)+' / '+(s.w.years?s.w.years+' год.':''):'—'}</td>
+  </tr>`).join('');
+  const total=svc.reduce((s,e)=>s+(parseFloat(e.price)||0),0);
+  const html=`<!DOCTYPE html><html lang="bg"><head><meta charset="UTF-8">
+  <title>Сервизна книжка — ${v.plate||vlabel(v)}</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:12px;color:#000;margin:20px}
+    h1{font-size:18px;font-weight:bold;margin:0 0 4px}
+    h2{font-size:13px;font-weight:normal;color:#555;margin:0 0 16px}
+    .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;border-bottom:2px solid #0369a1;padding-bottom:12px}
+    .car-info{font-size:12px;color:#333;line-height:1.8}
+    .brand-info{text-align:right;font-size:11px;color:#666}
+    table{width:100%;border-collapse:collapse;margin-top:8px;font-size:11px}
+    th{background:#0369a1;color:#fff;padding:7px 8px;text-align:left;font-weight:600}
+    td{padding:6px 8px;border-bottom:1px solid #e5e7eb;vertical-align:top}
+    tr:nth-child(even) td{background:#f8fafc}
+    .total-row td{font-weight:bold;background:#f0f9ff;border-top:2px solid #0369a1}
+    .footer{margin-top:20px;font-size:10px;color:#9ca3af;border-top:1px solid #e5e7eb;padding-top:8px;display:flex;justify-content:space-between}
+    .print-btn{margin-top:16px;padding:8px 16px;background:#0369a1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px}
+    @media print{.print-btn{display:none}body{margin:10px}}
+  </style></head><body>
+  <div class="header">
+    <div>
+      <h1>📋 СЕРВИЗНА КНИЖКА</h1>
+      <h2>${vlabel(v)} · ${v.plate||'—'} · VIN: ${v.vin||'—'}</h2>
+      <div class="car-info">
+        Фирма: <b>${v.company||'—'}</b> &nbsp;·&nbsp;
+        Година: <b>${v.year||'—'}</b> &nbsp;·&nbsp;
+        Отговорник: <b>${v.responsible||'—'}</b><br>
+        Текущ пробег: <b>${v.currentKm?Number(v.currentKm).toLocaleString('bg-BG')+' км':'—'}</b>
+      </div>
+    </div>
+    <div class="brand-info">
+      <b>GreenAutoSystems</b><br>
+      AutoSystems-10<br>
+      Green Systems Net SVCC<br>
+      +359 899 696 907<br>
+      Дата на печат: ${new Date().toLocaleDateString('bg-BG')}
+    </div>
+  </div>
+  <table>
+    <thead><tr><th>Дата</th><th>Км</th><th>Тип</th><th>Описание</th><th>Сервиз</th><th>Цена</th><th>Фактура №</th><th>Гаранция</th></tr></thead>
+    <tbody>
+      ${rows||'<tr><td colspan="8" style="text-align:center;color:#9ca3af;padding:20px">Няма записи в сервизната книжка</td></tr>'}
+      ${total>0?`<tr class="total-row"><td colspan="5" style="text-align:right">ОБЩО:</td><td>${total.toLocaleString('bg-BG')} лв</td><td colspan="2"></td></tr>`:''}
+    </tbody>
+  </table>
+  <button class="print-btn" onclick="window.print()">🖨 Печат (A4)</button>
+  <div class="footer">
+    <span>GreenAutoSystems · AutoSystems-10 · Green Systems Net SVCC © 2026 · green.systems.net@gmail.com</span>
+    <span>Green Systems Net SVCC не носи отговорност за: грешно или непълно въведени данни; пропуснати срокове или изтекли документи; наложени глоби, санкции или административни последствия; загуба на данни; повреда на хардуер или софтуер; преки, косвени или последващи вреди от каквото и да е естество. Потребителят носи пълна отговорност за въведената информация и за спазването на всички законови изисквания.</span>
+  </div>
+  </body></html>`;
+  const wnd=window.open('','_blank');wnd.document.write(html);wnd.document.close();
+}
+
+/* ===== ПЪТЕН ЛИСТ ===== */
+function printWaybill(id){
+  const v=DB.vehicles.find(x=>x.id===id);if(!v)return;
+  const w=v.waybill||{};
+  const org=w.org||DB.config?.firmName||'',owner=w.owner||v.company||'',nm=w.name||vlabel(v),eik=w.eik||DB.config?.eik||'',req=w.req||DB.config?.addr||'',drv=w.driver||v.responsible||'',norms=w.norms||'',fuel=fuelLabel(v)||'';
+  const rows=Array.from({length:8}).map((_,i)=>`<tr><td>${i+1}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`).join('');
+  const html=`<!DOCTYPE html><html lang="bg"><head><meta charset="UTF-8"><title>Пътен лист ${v.plate||''}</title>
+  <style>body{font-family:Arial;font-size:12px;color:#000;margin:18px}table{width:100%;border-collapse:collapse}td,th{border:1px solid #000;padding:5px;text-align:center}h2{text-align:center;margin:6px 0}.hd{display:flex;justify-content:space-between;font-size:11px}.row{display:flex;gap:20px;flex-wrap:wrap;margin:6px 0}.foot{margin-top:10px;font-size:11px}.sig{display:flex;gap:40px;margin-top:24px}@media print{button{display:none}}</style></head><body>
+  <div class="hd"><div><b>${req||''}</b></div><div>Организация: <b>${org}</b></div></div>
+  <h2>ПЪТЕН ЛИСТ за оборудван лек автомобил</h2>
+  <div class="row"><div>Автомобил: <b>${nm}</b></div><div>Рег. №: <b>${v.plate||''}</b></div><div>Гориво: <b>${fuel}</b></div><div>Фирма: <b>${owner}</b></div></div>
+  <table><thead><tr><th>№</th><th>Показания нач./край</th><th>Маршрут / техническа поддръжка</th><th>Километри</th><th>Вид гориво</th><th>Градско</th><th>Извън града</th><th>Общо гориво</th></tr></thead><tbody>${rows}</tbody></table>
+  <div class="foot">ЕИК: <b>${eik}</b> &nbsp;&nbsp; ОБЩО км: __________ &nbsp;&nbsp; ОБЩО литри/кг: __________<br>${norms?'Норми разход: '+norms:''}</div>
+  <div class="sig"><div>Водач: <b>${drv}</b> ............. (подпис)</div><div>Техн. ръководител: ............. (подпис)</div><div>Дата: .............</div></div>
+  <button style="margin-top:18px;padding:8px 14px;cursor:pointer" onclick="window.print()">🖨 Печат</button>
+  </body></html>`;
+  const wnd=window.open('','_blank');wnd.document.write(html);wnd.document.close();
+}
+
+/* ===== КАЛЕНДАР .ics ===== */
+function icsDate(s){return s.replace(/-/g,'');}
+function exportICS(){
+  const al=collectAlerts().filter(x=>x.date);
+  const firmName='GreenAutoSystems ДЕМО';
+  let lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//GreenAutoSystems//Fleet//BG','CALSCALE:GREGORIAN','X-WR-CALNAME:'+firmName+' — Срокове'];
+  al.forEach(x=>{const d=icsDate(x.date);lines.push('BEGIN:VEVENT','UID:'+uid()+'@greenautosystems','DTSTART;VALUE=DATE:'+d,'SUMMARY:'+(x.name+' — '+x.cat),'DESCRIPTION:'+(x.reg+' · '+(x.info||'')),'BEGIN:VALARM','TRIGGER:-P'+LEAD_DAYS+'D','ACTION:DISPLAY','DESCRIPTION:Напомняне '+LEAD_DAYS+' дни преди срока','END:VALARM','END:VEVENT');});
+  lines.push('END:VCALENDAR');
+  const blob=new Blob([lines.join('\r\n')],{type:'text/calendar'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='greenautosystems_kalendar_'+new Date().toISOString().slice(0,10)+'.ics';a.click();
+  if(!al.length)alert('Няма срокове с дата за експорт.');
+}
+
+/* ===== АРХИВ ===== */
+function exportData(){
+  const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='greenautosystems_arhiv_'+new D
