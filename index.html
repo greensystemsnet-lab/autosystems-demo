@@ -124,43 +124,26 @@
 </head>
 <body>
 
-<!-- ===== ЛИЦЕНЗ ЕКРАН ===== -->
-<div id="licenseScreen">
-  <div class="license-box">
-    <div class="logo">🚗</div>
-    <div class="brand">GreenAutoSystems</div>
-    <div class="pkg">AutoSystems-10 · до 10 автомобила</div>
-    <div class="demo-badge">⚠ ДЕМО ВЕРСИЯ</div>
-    <div class="info-row">
-      <div class="lbl">Лицензиран за</div>
-      <div class="val">ДЕМО — данните са примерни</div>
+<!-- ===== LOGIN (обединен с лиценз екран) ===== -->
+<div id="loginScreen" style="position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:999">
+  <div style="background:rgba(30,41,59,.97);border:2px solid #0ea5e9;border-radius:20px;padding:36px 44px;width:380px;text-align:center;box-shadow:0 0 60px rgba(14,165,233,.2)">
+    <div style="font-size:46px;margin-bottom:8px">🚗</div>
+    <div style="font-size:26px;font-weight:800;color:#7dd3fc;margin-bottom:4px">GreenAutoSystems</div>
+    <div style="font-size:13px;color:#38bdf8;font-weight:600;margin-bottom:14px">AutoSystems-10 · до 10 автомобила</div>
+    <div style="display:inline-block;background:linear-gradient(90deg,#f59e0b,#d97706);color:#fff;font-size:11px;font-weight:800;padding:4px 16px;border-radius:20px;letter-spacing:1px;margin-bottom:20px">⚠ ДЕМО ВЕРСИЯ</div>
+    <div style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.3);border-radius:10px;padding:10px 16px;margin-bottom:18px;text-align:left;font-size:12px;color:#94a3b8">
+      Разработено от: <b style="color:#e2e8f0">Green Systems Net SVCC · Sofia</b><br>
+      Данните са примерни · Полетата са заключени
     </div>
-    <div class="info-row">
-      <div class="lbl">Разработено от</div>
-      <div class="val">Green Systems Net SVCC · Sofia, Bulgaria</div>
-    </div>
-    <button class="btn-enter" onclick="showLogin()">Разгледай ДЕМО →</button>
-  </div>
-  <div class="copy">GreenAutoSystems © 2026 · Green Systems Net SVCC · +359 899 696 907 · green.systems.net@gmail.com</div>
-</div>
-
-<!-- ===== LOGIN ===== -->
-<div id="loginScreen">
-  <div class="login-box">
-    <div class="logo">🚗</div>
-    <h1>GreenAutoSystems</h1>
-    <div class="pkg-lbl">AutoSystems-10</div>
-    <div class="tagline">Управление на фирмени автомобили · ДЕМО версия</div>
-    <div class="err" id="loginErr">Грешна парола. Опитай отново.</div>
-    <label>Парола за достъп</label>
-    <input type="password" id="passInput" placeholder="Въведи паролата" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="btn-login" onclick="doLogin()">Вход →</button>
-    <div class="demo-hint">
-      📋 <b>ДЕМО версия</b> · Парола: <b>demo2024</b><br>
-      Данните са примерни. Полетата за въвеждане са заключени.
+    <div id="loginErr" style="color:#fca5a5;font-size:12px;margin-bottom:8px;display:none">Грешна парола. Опитай отново.</div>
+    <div style="text-align:left;font-size:11px;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Парола за достъп</div>
+    <input type="password" id="passInput" placeholder="demo2024" onkeydown="if(event.key==='Enter')doLogin()" style="width:100%;padding:10px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:14px;margin-bottom:12px">
+    <button onclick="doLogin()" style="width:100%;padding:12px;background:linear-gradient(90deg,#0ea5e9,#1e3a8a);color:#fff;border:none;border-radius:9px;font-size:15px;font-weight:700;cursor:pointer">Вход →</button>
+    <div style="margin-top:14px;font-size:12px;color:#475569;background:#0f172a;border-radius:8px;padding:8px 12px;text-align:left">
+      📋 Парола: <b style="color:#7dd3fc">demo2024</b>
     </div>
   </div>
-  <div class="version">GreenAutoSystems · AutoSystems-10 · ДЕМО · Green Systems Net SVCC © 2026</div>
+  <div style="color:#1e3a8a;font-size:11px;margin-top:16px">GreenAutoSystems · AutoSystems-10 · ДЕМО · Green Systems Net SVCC © 2026</div>
 </div>
 
 <!-- ===== APP ===== -->
@@ -205,26 +188,14 @@ function demoBlock(msg){
 }
 
 /* ===== ЛИЦЕНЗ / LOGIN ===== */
-function showLogin(){
-  var ls=document.getElementById('licenseScreen');
-  var login=document.getElementById('loginScreen');
-  ls.style.display='none';
-  ls.style.visibility='hidden';
-  ls.style.zIndex='-1';
-  login.style.display='flex';
-  login.style.flexDirection='column';
-  login.style.alignItems='center';
-  login.style.justifyContent='center';
-  login.style.visibility='visible';
-  login.classList.add('show');
-}
+function showLogin(){}
 const PASS_KEY='greenautosystems_demo_auth';
 const DEMO_PASS='demo2024';
 function doLogin(){
-  const p=document.getElementById('passInput').value;
+  var p=document.getElementById('passInput').value;
   if(p===DEMO_PASS){
     sessionStorage.setItem(PASS_KEY,'1');
-    document.getElementById('loginScreen').classList.remove('show');
+    document.getElementById('loginScreen').style.display='none';
     document.getElementById('app').style.display='block';
     updateFirmBadge();render();
   } else {
@@ -234,7 +205,7 @@ function doLogin(){
 }
 function doLogout(){
   sessionStorage.removeItem(PASS_KEY);
-  document.getElementById('loginScreen').classList.add('show');
+  document.getElementById('loginScreen').style.display='flex';
   document.getElementById('app').style.display='none';
   document.getElementById('passInput').value='';
   document.getElementById('loginErr').style.display='none';
@@ -790,6 +761,4 @@ function exportICS(){
   let lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//GreenAutoSystems//Fleet//BG','CALSCALE:GREGORIAN','X-WR-CALNAME:'+firmName+' — Срокове'];
   al.forEach(x=>{const d=icsDate(x.date);lines.push('BEGIN:VEVENT','UID:'+uid()+'@greenautosystems','DTSTART;VALUE=DATE:'+d,'SUMMARY:'+(x.name+' — '+x.cat),'DESCRIPTION:'+(x.reg+' · '+(x.info||'')),'BEGIN:VALARM','TRIGGER:-P'+LEAD_DAYS+'D','ACTION:DISPLAY','DESCRIPTION:Напомняне '+LEAD_DAYS+' дни преди срока','END:VALARM','END:VEVENT');});
   lines.push('END:VCALENDAR');
-  const blob=new Blob([lines.join('\r\n')],{type:'text/calendar'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='greenautosystems_kalendar_'+new Date().toISOString().slice(0,10)+'.ics';a.click();
-  if(!al.length)alert('Няма срокове с дата за
+  const blob=new Blob([lines.join('\r\n')],{type:'text/
